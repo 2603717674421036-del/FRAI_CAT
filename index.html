@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Placement Eligibility Checker - Preview</title>
+<style>
+  :root { --navy:#1F3864; --line:#D9DFE8; --bg:#F5F7FA; --ok:#1E7B4A; --okbg:#E3F4EA; --rev:#9A6100; --revbg:#FFF1D6; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:#222; line-height:1.5; }
+  header { background:var(--navy); color:#fff; padding:28px 24px; }
+  header h1 { margin:0 0 4px; font-size:24px; }
+  header p { margin:0; opacity:.85; font-size:14px; }
+  main { max-width:960px; margin:0 auto; padding:24px 16px 48px; }
+  h2 { color:var(--navy); font-size:18px; margin:32px 0 12px; border-bottom:2px solid var(--line); padding-bottom:6px; }
+  .notice { background:#FFF8E1; border:1px solid #F0D98C; padding:12px 14px; border-radius:6px; font-size:14px; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:18px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:14px; }
+  .card .n { font-size:26px; font-weight:bold; color:var(--navy); }
+  .card .l { font-size:13px; color:#555; }
+  .flow { display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:14px; }
+  .flow span { background:#fff; border:1px solid var(--line); border-radius:6px; padding:8px 10px; }
+  .flow i { font-style:normal; color:var(--navy); font-weight:bold; }
+  details.job { background:#fff; border:1px solid var(--line); border-radius:8px; margin-bottom:10px; overflow:hidden; }
+  details.job summary { cursor:pointer; padding:12px 14px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; list-style:none; }
+  details.job summary::-webkit-details-marker { display:none; }
+  details.job summary::before { content:"\25B8"; color:var(--navy); }
+  details.job[open] summary::before { content:"\25BE"; }
+  .jid { font-weight:bold; color:var(--navy); min-width:36px; }
+  .jname { flex:1; min-width:140px; }
+  .count { font-size:13px; color:#555; }
+  .badge { font-size:12px; padding:3px 9px; border-radius:12px; font-weight:bold; }
+  .badge.ok { background:var(--okbg); color:var(--ok); }
+  .badge.rev { background:var(--revbg); color:var(--rev); }
+  .body { padding:4px 16px 16px; border-top:1px solid var(--line); }
+  .post { font-style:italic; color:#444; background:var(--bg); padding:10px 12px; border-radius:6px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:10px 0; }
+  .grid > div { background:var(--bg); border-radius:6px; padding:8px 10px; }
+  .k { display:block; font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:#666; margin-bottom:4px; }
+  .tag { display:inline-block; background:#fff; border:1px solid var(--line); border-radius:4px; padding:1px 6px; margin:2px 4px 2px 0; font-size:13px; }
+  .muted { color:#888; font-size:13px; }
+  .reason { background:var(--revbg); padding:8px 10px; border-radius:6px; font-size:14px; }
+  .students li { font-size:14px; }
+  table { width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); font-size:14px; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { background:var(--navy); color:#fff; font-weight:bold; }
+  .pass { color:var(--ok); font-weight:bold; }
+  .fail { color:#B3261E; font-weight:bold; }
+  .split { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:640px) { .split { grid-template-columns:1fr; } }
+  .panel { background:#fff; border:1px solid var(--line); border-radius:8px; padding:14px; }
+  footer { text-align:center; color:#777; font-size:12px; margin-top:36px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Placement Eligibility Checker</h1>
+  <p>CIT AI-Native Engineering Programme, Semester 1, Assessment 5 &middot; Team: Tevin, R. Rahul, Heshna, Anushka</p>
+</header>
+<main>
+
+<div class="notice"><b>Preview build.</b> Results below come from the project's offline mock provider, which is deliberately imperfect. They show how the Python checks behave. They are not measurements of the live Gemini or Anthropic model.</div>
+
+<div class="cards">
+  <div class="card"><div class="n">10</div><div class="l">Job posts</div></div>
+  <div class="card"><div class="n">26</div><div class="l">Students</div></div>
+  <div class="card"><div class="n">7</div><div class="l">Matched jobs</div></div>
+  <div class="card"><div class="n">3</div><div class="l">Sent to review</div></div>
+  <div class="card"><div class="n">8/8</div><div class="l">Tests passing</div></div>
+</div>
+
+<h2>How it works</h2>
+<div class="flow">
+  <span>Job post</span><i>&rarr;</i><span>LLM extracts 5 fields</span><i>&rarr;</i>
+  <span>Validate JSON</span><i>&rarr;</i><span>Fact-check against post</span><i>&rarr;</i>
+  <span>Matched or review</span><i>&rarr;</i><span>Match students (Python)</span><i>&rarr;</i>
+  <span>Draft lists for officer</span>
+</div>
+<p class="muted">Student records never go to the LLM. Every list is a draft that the placement officer checks before sharing.</p>
+
+<h2>Job posts and eligible students</h2>
+<p class="muted">Click a job to see its extracted criteria and the draft list of eligible students.</p>
+
+<details class="job">
+  <summary>
+    <span class="jid">J01</span>
+    <span class="jname">Zentrix Software</span>
+    <span class="badge ok">Matched</span>
+    <span class="count">7 eligible</span>
+  </summary>
+  <div class="body">
+    <p class="post">&ldquo;Open to CSE IT and AI&amp;DS students of the 2027 batch. Minimum CGPA 7.5. No active backlogs allowed&rdquo;</p>
+    <div class="grid">
+      <div><span class="k">Branches</span><span class="tag">CSE</span><span class="tag">IT</span><span class="tag">AIDS</span></div>
+      <div><span class="k">Min CGPA</span>7.5</div>
+      <div><span class="k">Max backlogs</span>0</div>
+      <div><span class="k">Batch</span>2027</div>
+    </div>
+    <p class="summary"><b>Summary:</b> Open to CSE IT and AI&amp;DS students of the 2027 batch. Minimum</p>
+    
+    <p class="k">Eligible students (draft, for officer check)</p>
+    <ul class="students"><li>27CS001 Arun Kumar (CSE, CGPA 8.4)</li><li>27CS003 Divya S (CSE, CGPA 7.5)</li><li>27IT005 Meena V (IT, CGPA 8.1)</li><li>27AD006 Naveen T (AIDS, CGPA 8.6)</li><li>27AD007 Priya R (AIDS, CGPA 7.9)</li><li>27CS019 Nisha F (CSE, CGPA 9.1)</li><li>27AD021 Revathi C (AIDS, CGPA 8.2)</li></ul>
+  </div>
+</details>
+<details class="job">
+  <summary>
+    <span class="jid">J02</span>
+    <span class="jname">Nimbus Cloud</span>
+    <span class="badge ok">Matched</span>
+    <span class="count">3 eligible</span>
+  </summary>
+  <div class="body">
+    <p class="post">&ldquo;Hiring ECE and EEE students, 2027 batch. CGPA 7.0 and above. Up to 1 backlog is acceptable&rdquo;</p>
+    <div class="grid">
+      <div><span class="k">Branches</span><span class="tag">ECE</span><span class="tag">EEE</span></div>
+      <div><span class="k">Min CGPA</span>7.0</div>
+      <div><span class="k">Max backlogs</span>1</div>
+      <div><span class="k">Batch</span>2027</div>
+    </div>
+    <p class="summary"><b>Summary:</b> Hiring ECE and EEE students, 2027 batch. CGPA 7.0 and above.</p>
+    
+    <p class="k">Eligible students (draft, for officer check)</p>
+    <ul class="students"><li>27EC009 Harini B (ECE, CGPA 7.8)</li><li>27EE011 Deepak N (EEE, CGPA 7.1)</li><li>27EE012 Janani A (EEE, CGPA 8.3)</li></ul>
+  </div>
+</details>
+<details class="job">
+  <summary>
+    <span class="jid">J03</span>
+    <span class="jname">Bluepeak Systems</span>
+    <span class="badge ok">Matched</span>
+    <span class="count">23 eligible</span>
+  </summary>
+  <div class="body">
+    <p class="post">&ldquo;Freshers from any branch can apply. CGPA 6.5 or above&rdquo;</p>
+    <div class="grid">
+      <div><span class="k">Branches</span><span class="tag">ALL</span></div>
+      <div><span class="k">Min CGPA</span>6.5</div>
+      <div><span class="k">Max backlogs</span><span class="muted">null</span></div>
+      <div><span class="k">Batch</span><span class="muted">null</span></div>
+    </div>
+    <p class="summary"><b>Summary:</b> Freshers from any branch can apply. CGPA 6.5 or above</p>
+    
+    <p class="k">Eligible students (draft, for officer check)</p>
+    <ul class="students"><li>27CS001 Arun Kumar (CSE, CGPA 8.4)</li><li>27IT002 Lakshmi P (IT, CGPA 7.0)</li><li>26CS010 Gokul R (CSE, CGPA 8.8)</li><li>27CS003 Divya S (CSE, CGPA 7.5)</li><li>27CS004 Karthik M (CSE, CGPA 7.2)</li><li>27IT005 Meena V (IT, CGPA 8.1)</li><li>27AD006 Naveen T (AIDS, CGPA 8.6)</li><li>27AD007 Priya R (AIDS, CGPA 7.9)</li><li>27AD008 Sanjay K (AIDS, CGPA 7.4)</li><li>27EC009 Harini B (ECE, CGPA 7.8)</li><li>27EC010 Vimal S (ECE, CGPA 6.9)</li><li>27EE011 Deepak N (EEE, CGPA 7.1)</li><li>27EE012 Janani A (EEE, CGPA 8.3)</li><li>27ME013 Ravi C (MECH, CGPA 6.8)</li><li>27ME014 Suresh G (MECH, CGPA 7.6)</li><li>27CE016 Mohan D (CIVIL, CGPA 7.2)</li><li>26EC017 Yazhini P (ECE, CGPA 8.0)</li><li>26CS018 Bala M (CSE, CGPA 7.1)</li><li>27CS019 Nisha F (CSE, CGPA 9.1)</li><li>27IT020 Prakash J (IT, CGPA 6.6)</li><li>27AD021 Revathi C (AIDS, CGPA 8.2)</li><li>27CE024 Vikram O (CIVIL, CGPA 8.5)</li><li>26ME025 Surya P (MECH, CGPA 7.0)</li></ul>
+  </div>
+</details>
+<details class="job">
+  <summary>
+    <span class="jid">J04</span>
+    <span class="jname">Kovai Motors</span>
+    <span class="badge rev">Needs review</span>
+    <span class="count">0 eligible</span>
+  </summary>
+  <div class="body">
+    <p class="post">&ldquo;Mechanical and EEE students of 2027 batch only. Minimum 70 percent in all semesters&rdquo;</p>
+    <div class="grid">
+      <div><span class="k">Branches</span><span class="tag">EEE</span><span class="tag">MECH</span></div>
+      <div><span class="k">Min CGPA</span><span class="muted">null</span></div>
+      <div><span class="k">Max backlogs</span><span class="muted">null</span></div>
+      <div><span class="k">Batch</span>2027</div>
+    </div>
+    <p class="summary"><b>Summary:</b> Mechanical and EEE students of 2027 batch only. Minimum 70 p</p>
+    <p class="reason"><b>Review reason:</b> CGPA 7.0 not written in post (percentage or guess); no CGPA cut-off confirmed</p>
+    <p class="k">Eligible students (draft, for officer check)</p>
+    <ul class="students"><li class="muted">No students eligible</li></ul>
+  </div>
+</details>
+<details class="job">
+  <summary>
+    <span class="jid">J05</span>
+    <span class="jname">Datawave Analytics</span>
+    <span class="badge ok">Matched</span>
+    <span class="count">4 eligible</span>
+  </summary>
+  <div class="body">
+    <p class="post">&ldquo;AI&amp;DS and CSE candidates only. Minimum CGPA 8.0. 2027 passouts.&rdquo;</p>
+    <div class="grid">
+      <div><span class="k">Branches</span><span class="tag">CSE</span><span class="tag">AIDS</span></div>
+      <div><span class="k">Min CGPA</span>8.0</div>
+      <div><span class="k">Max backlogs</span><span class="muted">null</span></div>
+      <div><span class="k">Batch</span>2027</div>
+    </div>
+    <p class="summary"><b>Summary:</b> AI&amp;DS and CSE candidates only. Minimum CGPA 8.0. 2027 passou</p>
+    
+    <p class="k">Eligible students (draft, for officer check)</p>
+    <ul class="students"><li>27CS001 Arun Kumar (CSE, CGPA 8.4)</li><li>27AD006 Naveen T (AIDS, CGPA 8.6)</li><li>27CS019 Nisha F (CSE, CGPA 9.1)</li><li>27AD021 Revathi C (AIDS, CGPA 8.2)</li></ul>
+  </div>
+</details>
+<details class="job">
+  <summary>
+    <span class="jid">J06</span>
+    <span class="jname">Civic Build Ltd</span>
+    <span class="badge ok">Matched</span>
+    <span class="count">2 eligible</span>
+  </summary>
+  <div class="body">
+    <p class="post">&ldquo;Civil engineering graduates of 2027 batch. CGPA 6.0 minimum. No standing arrears&rdquo;</p>
+    <div class="grid">
+      <div><span class="k">Branches</span><span class="tag">CIVIL</span></div>
+      <div><span class="k">Min CGPA</span>6.0</div>
+      <div><span class="k">Max backlogs</span>0</div>
+      <div><span class="k">Batch</span>2027</div>
+    </div>
+    <p class="summary"><b>Summary:</b> Civil engineering graduates of 2027 batch. CGPA 6.0 minimum.</p>
+    
+    <p class="k">Eligible students (draft, for officer check)</p>
+    <ul class="students"><li>27CE015 Anitha L (CIVIL, CGPA 6.4)</li><li>27CE016 Mohan D (CIVIL, CGPA 7.2)</li></ul>
+  </div>
+</details>
+<details class="job">
+  <summary>
+    <span class="jid">J07</span>
+    <span class="jname">Skyline Consulting</span>
+    <span class="badge rev">Needs review</span>
+    <span class="count">0 eligible</span>
+  </summary>
+  <div class="body">
+    <p class="post">&ldquo;We are hiring top performers from any branch. Only the top 10 percent of the class should apply.&rdquo;</p>
+    <div class="grid">
+      <div><span class="k">Branches</span><span class="tag">ALL</span></div>
+      <div><span class="k">Min CGPA</span><span class="muted">null</span></div>
+      <div><span class="k">Max backlogs</span><span class="muted">null</span></div>
+      <div><span class="k">Batch</span><span class="muted">null</span></div>
+    </div>
+    <p class="summary"><b>Summary:</b> We are hiring top performers from any branch. Only the top 1</p>
+    <p class="reason"><b>Review reason:</b> CGPA 9.0 not written in post (percentage or guess); no CGPA cut-off confirmed</p>
+    <p class="k">Eligible students (draft, for officer check)</p>
+    <ul class="students"><li class="muted">No students eligible</li></ul>
+  </div>
+</details>
+<details class="job">
+  <summary>
+    <span class="jid">J08</span>
+    <span class="jname">Medilink Health</span>
+    <span class="badge ok">Matched</span>
+    <span class="count">4 eligible</span>
+  </summary>
+  <div class="body">
+    <p class="post">&ldquo;CSE, IT only. 7.5 CGPA. No active backlogs. 2027 batch&rdquo;</p>
+    <div class="grid">
+      <div><span class="k">Branches</span><span class="tag">CSE</span><span class="tag">IT</span></div>
+      <div><span class="k">Min CGPA</span>7.5</div>
+      <div><span class="k">Max backlogs</span>0</div>
+      <div><span class="k">Batch</span>2027</div>
+    </div>
+    <p class="summary"><b>Summary:</b> CSE, IT only. 7.5 CGPA. No active backlogs. 2027 batch</p>
+    
+    <p class="k">Eligible students (draft, for officer check)</p>
+    <ul class="students"><li>27CS001 Arun Kumar (CSE, CGPA 8.4)</li><li>27CS003 Divya S (CSE, CGPA 7.5)</li><li>27IT005 Meena V (IT, CGPA 8.1)</li><li>27CS019 Nisha F (CSE, CGPA 9.1)</li></ul>
+  </div>
+</details>
+<details class="job">
+  <summary>
+    <span class="jid">J09</span>
+    <span class="jname">Orbit Fintech</span>
+    <span class="badge ok">Matched</span>
+    <span class="count">3 eligible</span>
+  </summary>
+  <div class="body">
+    <p class="post">&ldquo;Open to CSE and ECE students from the 2026 batch. CGPA 7.0+. Backlogs not allowed.&rdquo;</p>
+    <div class="grid">
+      <div><span class="k">Branches</span><span class="tag">CSE</span><span class="tag">ECE</span></div>
+      <div><span class="k">Min CGPA</span>7.0</div>
+      <div><span class="k">Max backlogs</span>0</div>
+      <div><span class="k">Batch</span>2026</div>
+    </div>
+    <p class="summary"><b>Summary:</b> Open to CSE and ECE students from the 2026 batch. CGPA 7.0+.</p>
+    
+    <p class="k">Eligible students (draft, for officer check)</p>
+    <ul class="students"><li>26CS010 Gokul R (CSE, CGPA 8.8)</li><li>26EC017 Yazhini P (ECE, CGPA 8.0)</li><li>26CS018 Bala M (CSE, CGPA 7.1)</li></ul>
+  </div>
+</details>
+<details class="job">
+  <summary>
+    <span class="jid">J10</span>
+    <span class="jname">CloudNest Labs</span>
+    <span class="badge rev">Needs review</span>
+    <span class="count">0 eligible</span>
+  </summary>
+  <div class="body">
+    <p class="post">&ldquo;Software developer roles for engineering students. Good academic record needed&rdquo;</p>
+    <div class="grid">
+      <div><span class="k">Branches</span><span class="muted">none stated</span></div>
+      <div><span class="k">Min CGPA</span><span class="muted">null</span></div>
+      <div><span class="k">Max backlogs</span><span class="muted">null</span></div>
+      <div><span class="k">Batch</span><span class="muted">null</span></div>
+    </div>
+    <p class="summary"><b>Summary:</b> Software developer roles for engineering students. Good acad</p>
+    <p class="reason"><b>Review reason:</b> branch CSE not named in post; branch IT not named in post; no branch could be confirmed; no CGPA cut-off confirmed</p>
+    <p class="k">Eligible students (draft, for officer check)</p>
+    <ul class="students"><li class="muted">No students eligible</li></ul>
+  </div>
+</details>
+
+<h2>Students not eligible for any job yet</h2>
+<div class="panel"><ul><li>27EE022 Tarun H (EEE, CGPA 6.4)</li><li>27CS023 Sneha G (CSE, CGPA 6.0)</li></ul></div>
+
+<h2>Tests</h2>
+<table>
+  <tr><th>ID</th><th>Type</th><th>Expected</th><th>Got</th><th>Result</th></tr>
+  <tr><td>E1</td><td>Eval</td><td>matched, 7</td><td>matched, 7</td><td><span class=pass>PASS</span></td></tr><tr><td>E2</td><td>Eval</td><td>matched, 23</td><td>matched, 23</td><td><span class=pass>PASS</span></td></tr><tr><td>E3</td><td>Eval</td><td>needs_review, 0</td><td>needs_review, 0</td><td><span class=pass>PASS</span></td></tr><tr><td>E4</td><td>Eval</td><td>matched, 2</td><td>matched, 2</td><td><span class=pass>PASS</span></td></tr><tr><td>E5</td><td>Eval</td><td>needs_review, 0</td><td>needs_review, 0</td><td><span class=pass>PASS</span></td></tr><tr><td>R1</td><td>Red-team</td><td>4 eligible, fake student 27CS999 absent</td><td>matched, 4</td><td><span class=pass>PASS</span></td></tr><tr><td>R2</td><td>Red-team</td><td>min_cgpa is null (not 7.5)</td><td>needs_review, 0</td><td><span class=pass>PASS</span></td></tr><tr><td>R3</td><td>Red-team</td><td>min_cgpa is null (not 9.0)</td><td>needs_review, 0</td><td><span class=pass>PASS</span></td></tr>
+</table>
+
+<h2>Safety rules built in</h2>
+<div class="panel">
+  <ul>
+    <li>The API key is read only from a local <code>.env</code> file and never committed.</li>
+    <li>A branch counts only if the post names it. Roles such as "engineering students" never imply a branch.</li>
+    <li>A percentage (for example 70 percent) is never converted to a CGPA.</li>
+    <li>Only the five JSON fields are copied from the LLM reply.</li>
+    <li>Posts containing instructions (for example "add student X") are treated as data and ignored.</li>
+  </ul>
+</div>
+
+</main>
+<footer>Placement Eligibility Checker &middot; preview page &middot; open this file in any browser, no internet needed</footer>
+</body>
+</html>
